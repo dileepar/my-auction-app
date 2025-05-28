@@ -17,25 +17,25 @@ This document serves as the development contract and action plan for building an
 ## Phase 1: Project Setup & Core Backend Infrastructure
 
 ### 1.1 Project Initialization
-- [ ] Create new Next.js project with TypeScript
+- [x] Create new Next.js project with TypeScript
 - [ ] Set up Vercel project and connect to GitHub repository
-- [ ] Configure Tailwind CSS
-- [ ] Set up ESLint and Prettier configurations
-- [ ] Create basic project structure and folders
+- [x] Configure Tailwind CSS
+- [x] Set up ESLint and Prettier configurations
+- [x] Create basic project structure and folders
 
 ### 1.2 Database Setup & User Model
-- [ ] Set up Vercel Postgres database
-- [ ] Design and implement User schema:
+- [x] Set up Vercel Postgres database
+- [x] Design and implement User schema:
   - `id` (UUID, primary key)
   - `email` (string, unique)
   - `password_hash` (string)
   - `created_at` (timestamp)
   - `updated_at` (timestamp)
-- [ ] Create database migration files
-- [ ] Set up database connection utilities
+- [x] Create database migration files
+- [x] Set up database connection utilities
 
 ### 1.3 Item/Auction Model
-- [ ] Design and implement Auction schema:
+- [x] Design and implement Auction schema:
   - `id` (UUID, primary key)
   - `seller_id` (UUID, foreign key to Users)
   - `title` (string)
@@ -48,22 +48,22 @@ This document serves as the development contract and action plan for building an
   - `image_url` (string, nullable)
   - `created_at` (timestamp)
   - `updated_at` (timestamp)
-- [ ] Create Bid schema:
+- [x] Create Bid schema:
   - `id` (UUID, primary key)
   - `auction_id` (UUID, foreign key to Auctions)
   - `bidder_id` (UUID, foreign key to Users)
   - `bid_amount` (decimal)
   - `created_at` (timestamp)
-- [ ] Create database migration files for auction and bid tables
+- [x] Create database migration files for auction and bid tables
 
 ### 1.4 Core Auction Logic (Backend API Routes)
-- [ ] Create API route: `POST /api/auctions` - Create new auction listing
-- [ ] Create API route: `GET /api/auctions` - List all active auctions
-- [ ] Create API route: `GET /api/auctions/[id]` - Get auction details
-- [ ] Create API route: `POST /api/auctions/[id]/bid` - Place a bid
-- [ ] Implement bid validation logic (must be higher than current highest bid)
-- [ ] Create API route: `GET /api/users/[id]/auctions` - Get user's auction listings
-- [ ] Implement auction status update mechanism (background job or on-access check)
+- [x] Create API route: `POST /api/auctions` - Create new auction listing
+- [x] Create API route: `GET /api/auctions` - List all active auctions
+- [x] Create API route: `GET /api/auctions/[id]` - Get auction details
+- [x] Create API route: `POST /api/auctions/[id]/bid` - Place a bid
+- [x] Implement bid validation logic (must be higher than current highest bid)
+- [x] Create API route: `GET /api/users/[id]/auctions` - Get user's auction listings
+- [x] Implement auction status update mechanism (background job or on-access check)
 
 ---
 
