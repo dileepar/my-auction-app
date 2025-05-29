@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  env: {
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    VERCEL_URL: process.env.VERCEL_URL,
+  }
 };
 
 export default nextConfig;
