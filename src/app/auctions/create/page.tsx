@@ -3,8 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navigation from '@/components/Navigation';
+import Image from 'next/image';
 
-export default async function CreateAuctionPage() {
+export default function CreateAuctionPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -241,9 +242,11 @@ export default async function CreateAuctionPage() {
                         <div className="flex items-center justify-center">
                           {imageUrl && !imageError ? (
                             <div className="relative">
-                              <img
+                              <Image
                                 src={imageUrl}
                                 alt="Preview"
+                                width={128}
+                                height={128}
                                 onError={handleImageError}
                                 className="w-full h-32 object-cover rounded-xl border-2 border-gray-200 shadow-sm"
                               />
