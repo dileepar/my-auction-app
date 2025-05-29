@@ -195,7 +195,7 @@ function AuctionDetailPage() {
                           min={currentBid + 0.01}
                           value={bidAmount}
                           onChange={(e) => setBidAmount(e.target.value)}
-                          className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 pr-12 py-3 sm:text-sm border-gray-300 rounded-md"
+                          className="focus:ring-blue-500 focus:border-blue-500 block w-full pl-7 pr-12 py-3 sm:text-sm border-gray-300 rounded-md text-gray-900 placeholder-gray-500"
                           placeholder="0.00"
                           required
                         />
