@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
 import { sql } from '@/lib/db';
+import { authOptions } from '@/lib/auth';
 import { PlaceBidRequest } from '@/types';
 
 // POST /api/auctions/[id]/bid - Place a bid
@@ -8,12 +10,28 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Get user session
+    const session = await getServerSession(authOptions);
+    
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Please log in to place a bid' },
+        { status: 401 }
+      );
+    }
+
+    const bidder_id = (session.user as any).id;
+
+    if (!bidder_id) {
+      return NextResponse.json(
+        { error: 'User ID not found in session' },
+        { status: 400 }
+      );
+    }
+
     const { id: auction_id } = await params;
     const body: PlaceBidRequest = await request.json();
     const { bid_amount } = body;
-
-    // TODO: Get user ID from session when auth is implemented
-    const bidder_id = 'temp-bidder-id'; // This will be replaced with actual auth
 
     // Validate bid amount
     if (!bid_amount || bid_amount <= 0) {

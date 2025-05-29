@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
 import { sql } from '@/lib/db';
+import { authOptions } from '@/lib/auth';
 import { CreateAuctionRequest } from '@/types';
 
 // GET /api/auctions - List all active auctions
@@ -30,12 +32,27 @@ export async function GET() {
 // POST /api/auctions - Create new auction listing
 export async function POST(request: NextRequest) {
   try {
+    // Get user session
+    const session = await getServerSession(authOptions);
+    
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Please log in to create an auction' },
+        { status: 401 }
+      );
+    }
+
+    const seller_id = (session.user as any).id;
+
+    if (!seller_id) {
+      return NextResponse.json(
+        { error: 'User ID not found in session' },
+        { status: 400 }
+      );
+    }
+
     const body: CreateAuctionRequest = await request.json();
     const { title, description, starting_price, end_time, image_url } = body;
-
-    // TODO: Get user ID from session when auth is implemented
-    // For now, we'll need to pass seller_id in the request or use a default
-    const seller_id = 'temp-seller-id'; // This will be replaced with actual auth
 
     // Validate required fields
     if (!title || !starting_price || !end_time) {
@@ -64,7 +81,7 @@ export async function POST(request: NextRequest) {
       RETURNING *
     `;
 
-    return NextResponse.json(result.rows[0], { status: 201 });
+    return NextResponse.json({ auction: result.rows[0] }, { status: 201 });
   } catch (error) {
     console.error('Error creating auction:', error);
     return NextResponse.json(
