@@ -2,20 +2,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import Navigation from '@/components/Navigation';
 
-export default function CreateAuctionPage() {
+export default async function CreateAuctionPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  // Redirect if not authenticated
-  if (status === 'unauthenticated') {
-    router.replace('/login');
-    return null;
-  }
+  const [imageUrl, setImageUrl] = useState('');
+  const [imageError, setImageError] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -58,132 +52,278 @@ export default function CreateAuctionPage() {
     }
   };
 
+  const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = e.target.value;
+    setImageUrl(url);
+    setImageError(false);
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   // Calculate minimum end time (24 hours from now)
   const minEndTime = new Date();
   minEndTime.setHours(minEndTime.getHours() + 24);
   const minEndTimeString = minEndTime.toISOString().slice(0, 16);
 
   return (
-    <div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <Navigation />
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="max-w-3xl mx-auto">
-            <h1 className="text-2xl font-semibold text-gray-900 mb-8">
-              Create New Auction
-            </h1>
+      <div className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
+        <div className="px-4 sm:px-0">
+          <div className="max-w-4xl mx-auto">
+            {/* Header Section */}
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-6">
+                <span className="text-3xl">🏷️</span>
+              </div>
+              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                Create New Auction
+              </h1>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                List your item and start receiving bids from buyers around the world. 
+                Fill out the details below to get started.
+              </p>
+            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
-                  {error}
+            {/* Main Form Card */}
+            <div className="bg-white shadow-2xl rounded-2xl border border-gray-100 overflow-hidden">
+              {/* Progress Bar */}
+              <div className="h-2 bg-gradient-to-r from-blue-600 to-purple-600"></div>
+              
+              <div className="p-8 lg:p-12">
+                <form onSubmit={handleSubmit} className="space-y-8">
+                  {error && (
+                    <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-lg animate-pulse">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                          <span className="text-red-400 text-xl">⚠️</span>
+                        </div>
+                        <div className="ml-3">
+                          <p className="text-red-700 font-medium">{error}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Auction Details Section */}
+                  <div className="space-y-6">
+                    <div className="border-b border-gray-200 pb-4">
+                      <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                        <span className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                          <span className="text-blue-600 font-bold">1</span>
+                        </span>
+                        Auction Details
+                      </h2>
+                      <p className="text-gray-600 mt-2 ml-11">Basic information about your auction item</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <div className="lg:col-span-2">
+                        <label htmlFor="title" className="block text-sm font-semibold text-gray-700 mb-2">
+                          Title *
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            name="title"
+                            id="title"
+                            required
+                            placeholder="Enter a compelling title for your auction"
+                            className="block w-full border-2 border-gray-200 rounded-xl shadow-sm py-4 px-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="lg:col-span-2">
+                        <label htmlFor="description" className="block text-sm font-semibold text-gray-700 mb-2">
+                          Description *
+                        </label>
+                        <textarea
+                          name="description"
+                          id="description"
+                          rows={6}
+                          required
+                          placeholder="Describe your item in detail. Include condition, features, and any relevant information buyers should know..."
+                          className="block w-full border-2 border-gray-200 rounded-xl shadow-sm py-4 px-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-300 resize-none"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Pricing & Timing Section */}
+                  <div className="space-y-6">
+                    <div className="border-b border-gray-200 pb-4">
+                      <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                        <span className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                          <span className="text-green-600 font-bold">2</span>
+                        </span>
+                        Pricing & Schedule
+                      </h2>
+                      <p className="text-gray-600 mt-2 ml-11">Set your starting price and auction duration</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <div>
+                        <label htmlFor="startingPrice" className="block text-sm font-semibold text-gray-700 mb-2">
+                          Starting Price *
+                        </label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <span className="text-gray-500 text-lg font-medium">$</span>
+                          </div>
+                          <input
+                            type="number"
+                            name="startingPrice"
+                            id="startingPrice"
+                            min="0.01"
+                            step="0.01"
+                            required
+                            placeholder="0.00"
+                            className="block w-full pl-8 pr-4 py-4 border-2 border-gray-200 rounded-xl shadow-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label htmlFor="endTime" className="block text-sm font-semibold text-gray-700 mb-2">
+                          End Time *
+                        </label>
+                        <input
+                          type="datetime-local"
+                          name="endTime"
+                          id="endTime"
+                          required
+                          min={minEndTimeString}
+                          className="block w-full border-2 border-gray-200 rounded-xl shadow-sm py-4 px-4 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                        />
+                        <p className="mt-2 text-sm text-gray-500 flex items-center">
+                          <span className="text-blue-500 mr-1">ℹ️</span>
+                          Auction must run for at least 24 hours
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Image Section */}
+                  <div className="space-y-6">
+                    <div className="border-b border-gray-200 pb-4">
+                      <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                        <span className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                          <span className="text-purple-600 font-bold">3</span>
+                        </span>
+                        Item Image
+                      </h2>
+                      <p className="text-gray-600 mt-2 ml-11">Add an image to showcase your item (optional)</p>
+                    </div>
+
+                    <div>
+                      <label htmlFor="imageUrl" className="block text-sm font-semibold text-gray-700 mb-2">
+                        Image URL
+                      </label>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                          <input
+                            type="url"
+                            name="imageUrl"
+                            id="imageUrl"
+                            value={imageUrl}
+                            onChange={handleImageUrlChange}
+                            placeholder="https://example.com/your-image.jpg"
+                            className="block w-full border-2 border-gray-200 rounded-xl shadow-sm py-4 px-4 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-300"
+                          />
+                          <p className="mt-2 text-sm text-gray-500">
+                            Enter a direct link to your image
+                          </p>
+                        </div>
+                        
+                        <div className="flex items-center justify-center">
+                          {imageUrl && !imageError ? (
+                            <div className="relative">
+                              <img
+                                src={imageUrl}
+                                alt="Preview"
+                                onError={handleImageError}
+                                className="w-full h-32 object-cover rounded-xl border-2 border-gray-200 shadow-sm"
+                              />
+                              <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-xs">✓</span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="w-full h-32 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center">
+                              <div className="text-center">
+                                <span className="text-4xl text-gray-400 mb-2 block">🖼️</span>
+                                <p className="text-sm text-gray-500">Image preview will appear here</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="pt-8 border-t border-gray-200">
+                    <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4">
+                      <button
+                        type="button"
+                        onClick={() => router.back()}
+                        className="w-full sm:w-auto px-8 py-3 text-sm font-semibold text-gray-700 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className={`w-full sm:w-auto px-8 py-3 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                          loading ? 'opacity-50 cursor-not-allowed transform-none' : ''
+                        }`}
+                      >
+                        {loading ? (
+                          <div className="flex items-center justify-center">
+                            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                            Creating Auction...
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center">
+                            <span className="mr-2">🚀</span>
+                            Create Auction
+                          </div>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            {/* Help Section */}
+            <div className="mt-12 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 border border-blue-100">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <span className="text-2xl mr-3">💡</span>
+                Tips for a Successful Auction
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                <div className="flex items-start">
+                  <span className="text-green-500 mr-2 flex-shrink-0 mt-0.5">✓</span>
+                  <span>Use clear, high-quality images to showcase your item</span>
                 </div>
-              )}
-
-              <div>
-                <label
-                  htmlFor="title"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Title
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  id="title"
-                  required
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
+                <div className="flex items-start">
+                  <span className="text-green-500 mr-2 flex-shrink-0 mt-0.5">✓</span>
+                  <span>Write detailed descriptions including condition and features</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-green-500 mr-2 flex-shrink-0 mt-0.5">✓</span>
+                  <span>Set competitive starting prices to attract more bidders</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-green-500 mr-2 flex-shrink-0 mt-0.5">✓</span>
+                  <span>Choose optimal auction duration for maximum exposure</span>
+                </div>
               </div>
-
-              <div>
-                <label
-                  htmlFor="description"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Description
-                </label>
-                <textarea
-                  name="description"
-                  id="description"
-                  rows={4}
-                  required
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="startingPrice"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Starting Price ($)
-                </label>
-                <input
-                  type="number"
-                  name="startingPrice"
-                  id="startingPrice"
-                  min="0.01"
-                  step="0.01"
-                  required
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="endTime"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  End Time
-                </label>
-                <input
-                  type="datetime-local"
-                  name="endTime"
-                  id="endTime"
-                  required
-                  min={minEndTimeString}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-                <p className="mt-1 text-sm text-gray-500">
-                  Auction must run for at least 24 hours
-                </p>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="imageUrl"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Image URL (optional)
-                </label>
-                <input
-                  type="url"
-                  name="imageUrl"
-                  id="imageUrl"
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-
-              <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  onClick={() => router.back()}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-500"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className={`px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                    loading ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                >
-                  {loading ? 'Creating...' : 'Create Auction'}
-                </button>
-              </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
