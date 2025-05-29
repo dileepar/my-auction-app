@@ -5,11 +5,6 @@ import bcrypt from 'bcryptjs';
 import { sql } from '@/lib/db';
 import { Session as NextAuthSession } from 'next-auth';
 
-interface User {
-  id: string;
-  email: string;
-}
-
 interface SessionUser {
   id: string;
   email: string;
