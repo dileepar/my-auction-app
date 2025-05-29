@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -8,12 +10,12 @@ export default function HomePage() {
               Online Auction Platform
             </h1>
             <nav className="space-x-4">
-              <a href="/auctions" className="text-blue-600 hover:text-blue-800">
+              <Link href="/auctions" className="text-blue-600 hover:text-blue-800">
                 Browse Auctions
-              </a>
-              <a href="/login" className="text-blue-600 hover:text-blue-800">
+              </Link>
+              <Link href="/login" className="text-blue-600 hover:text-blue-800">
                 Login
-              </a>
+              </Link>
             </nav>
           </div>
         </div>
@@ -29,12 +31,12 @@ export default function HomePage() {
           </p>
           
           <div className="mt-8 space-x-4">
-            <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700">
+            <Link href="/auctions" className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700">
               Start Bidding
-            </button>
-            <button className="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700">
+            </Link>
+            <Link href="/auctions/create" className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700">
               Create Auction
-            </button>
+            </Link>
           </div>
         </div>
 
