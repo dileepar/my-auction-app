@@ -104,25 +104,25 @@ This document serves as the development contract and action plan for building an
 ## Phase 3: Buyer Interface & Bidding System
 
 ### 3.1 Browse/View Auctions Interface
-- [ ] Create main auctions listing page (`/auctions`)
-- [ ] Display all active auctions in a grid/list layout
-- [ ] Show key information for each auction:
+- [x] Create main auctions listing page (`/auctions`)
+- [x] Display all active auctions in a grid/list layout
+- [x] Show key information for each auction:
   - Title
   - Current highest bid (or starting price if no bids)
   - Time remaining (countdown timer)
   - Thumbnail image (if available)
-- [ ] Implement auction detail page (`/auctions/[id]`)
-- [ ] Display full auction information on detail page
-- [ ] Add real-time countdown timer using client-side JavaScript
+- [x] Implement auction detail page (`/auctions/[id]`)
+- [x] Display full auction information on detail page
+- [x] Add real-time countdown timer using client-side JavaScript
 
 ### 3.2 Bidding Interface & Backend Integration
-- [ ] Add bid input form to auction detail page
-- [ ] Implement client-side bid validation
-- [ ] Connect bid form to `POST /api/auctions/[id]/bid` endpoint
-- [ ] Display immediate feedback for successful/failed bids
-- [ ] Add bid history section showing recent bids (without bidder names)
-- [ ] Implement automatic page refresh or polling for bid updates
-- [ ] Add protection against users bidding on their own auctions
+- [x] Add bid input form to auction detail page
+- [x] Implement client-side bid validation
+- [x] Connect bid form to `POST /api/auctions/[id]/bid` endpoint
+- [x] Display immediate feedback for successful/failed bids
+- [x] Add bid history section showing recent bids
+- [x] Implement automatic page refresh or polling for bid updates
+- [x] Add protection against users bidding on their own auctions
 
 ---
 

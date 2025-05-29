@@ -1,0 +1,326 @@
+---
+description: 
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+# Next.js 15: Key Best Practices for Enterprise Applications
+
+This document outlines essential best practices for developing robust, scalable, and performant enterprise applications using Next.js 15, focusing on aspects easily overlooked.
+
+## 1. Mastering Component Strategies and Data Flow
+
+### 1.1. Strategic Use of Server and Client Components
+
+-   **Server Components (Default in `app/`):**
+    -   Execute on the server, ideal for direct data access (databases, file system) and reducing client-side JavaScript.
+    -   Cannot use browser APIs (e.g., `window`, `localStorage`) or stateful hooks (`useState`, `useEffect`).
+    -   Enhance security by keeping sensitive logic and API keys server-side.
+-   **Client Components (`'use client';` directive):**
+    -   Execute in the browser, necessary for interactivity, event handling, and browser-specific APIs.
+-   **Key Best Practice:** Default to Server Components. Convert to Client Components *only* when browser-based interactivity or APIs are essential. This minimizes client-side bundle size.
+-   **Example (Server Component for Data Display):**
+    ```typescript
+    // app/components/ProductDetailsServer.tsx
+    async function getProduct(productId: string) {
+      // In a real app, fetch from your database or API
+      const res = await fetch(`https://fakestoreapi.com/products/${productId}`);
+      if (!res.ok) throw new Error('Failed to fetch product');
+      return res.json();
+    }
+
+    export default async function ProductDetailsServer({ productId }: { productId: string }) {
+      const product = await getProduct(productId);
+      return (
+        <div>
+          <h2>{product.title} (Server Rendered)</h2>
+          <p>{product.description}</p>
+          <p>Price: ${product.price}</p>
+        </div>
+      );
+    }
+    ```
+-   **Example (Client Component for an Interactive Counter):**
+    ```typescript
+    // app/components/ClickCounterClient.tsx
+    'use client';
+
+    import { useState } from 'react';
+
+    export default function ClickCounterClient() {
+      const [count, setCount] = useState(0);
+      return (
+        <button 
+          onClick={() => setCount(prev => prev + 1)} 
+          className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700"
+        >
+          You clicked {count} times
+        </button>
+      );
+    }
+    ```
+
+### 1.2. Advanced Data Fetching & Caching Patterns
+
+-   **ISR (Incremental Static Regeneration):** Balance static speed with dynamic content by revalidating data periodically. Crucial for content that changes, but not on every request.
+    ```typescript
+    // app/featured-post/page.tsx
+    export const revalidate = 3600; // Revalidate this page every hour
+
+    async function getFeaturedPost() {
+      const res = await fetch('[https://yourapi.com/featured-post](mdc:https:/yourapi.com/featured-post)', {
+        next: { revalidate: 3600 }, // Option 1: fetch-level revalidation
+      });
+      return res.json();
+    }
+
+    export default async function FeaturedPostPage() {
+      const post = await getFeaturedPost();
+      return <h1>{post.title}</h1>;
+    }
+    ```
+-   **Parallel Data Fetching:** In Server Components, use `Promise.all` for independent data fetches to minimize waterfalls and improve load times.
+    ```typescript
+    // app/user-profile/[id]/page.tsx
+    async function getUser(id: string) { /* ... */ }
+    async function getUserPosts(id: string) { /* ... */ }
+
+    export default async function UserProfilePage({ params }: { params: { id: string } }) {
+      const [user, posts] = await Promise.all([
+        getUser(params.id),
+        getUserPosts(params.id)
+      ]);
+      // Render user profile and posts
+    }
+    ```
+-   **Caching Headers:** For API Routes, explicitly set caching headers (`Cache-Control`) to optimize CDN and browser caching.
+
+### 1.3. Effective Layouts and Dynamic Metadata
+
+-   **Layouts (`layout.tsx`):** Structure shared UI consistently. Remember that layouts preserve state and don't re-render on navigation between child pages.
+-   **Dynamic Metadata (`generateMetadata`):** For SEO, ensure page titles, descriptions, and open graph tags are dynamically generated based on content, especially for item detail pages.
+    ```typescript
+    // app/products/[id]/page.tsx
+    import { Metadata } from 'next';
+
+    async function getProductTitle(id: string): Promise<string> {
+      // Fetch product data
+      const product = await fetch(`https://fakestoreapi.com/products/${id}`).then(res => res.json());
+      return product.title;
+    }
+
+    export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+      const title = await getProductTitle(params.id);
+      return {
+        title: `${title} | My E-commerce Site`,
+        description: `Details for ${title}`,
+      };
+    }
+
+    export default async function ProductPage({ params }: { params: { id: string } }) {
+      // ... page content
+    }
+    ```
+
+## 2. Robust Enterprise Workflow Details
+
+### 2.1. Maintainable Project Structure
+
+-   **Feature-Based Organization:** Group files by feature (e.g., `app/authentication/...`, `app/order-management/...`) for easier navigation and team collaboration as the application scales.
+    ```
+    src/
+    ├── app/
+    │   ├── order-management/
+    │   │   ├── [orderId]/
+    │   │   │   └── page.tsx
+    │   │   ├── components/
+    │   │   │   └── OrderStatusBadge.tsx
+    │   │   └── services/
+    │   │       └── fetchOrder.ts
+    │   └── layout.tsx
+    ├── components/ (globally shared, simple UI components)
+    │   └── AppLogo.tsx
+    └── lib/ (core utilities, API clients, constants)
+        └── apiClient.ts
+    ```
+
+### 2.2. Rigorous Code Style and Automated Tooling
+
+-   **ESLint & Prettier:** Mandate their use with shared configurations to maintain code consistency across the team and catch issues early. Integrate into CI.
+    -   `.eslintrc.json` (example snippet):
+        ```json
+        {
+          "extends": ["next/core-web-vitals", "eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
+          "rules": {
+            "no-unused-vars": "warn",
+            "@typescript-eslint/no-explicit-any": "warn"
+          }
+        }
+        ```
+
+### 2.3. Leveraging TypeScript Effectively
+
+-   **Strict Typing:** Enable `strict` mode in `tsconfig.json`. Use specific types over `any`. Define interfaces for API responses and complex objects.
+    ```typescript
+    // lib/types/api.ts
+    export interface ApiError {
+      statusCode: number;
+      message: string;
+    }
+
+    export interface User {
+      id: string;
+      email: string;
+      // Add other user properties
+    }
+    ```
+
+### 2.4. Secure and Flexible Environment Variables
+
+-   **Validation:** Consider validating environment variables at build time or app startup to catch configuration errors early.
+-   **Prefixing:** Remember `NEXT_PUBLIC_` exposes variables to the browser. Keep backend-only secrets (database URLs, private API keys) without this prefix.
+    ```env
+    # .env.production
+    # Server-side only
+    PAYMENT_GATEWAY_SECRET_KEY="prod_secret_xyz"
+    # Client-side accessible
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="prod_public_abc"
+    ```
+
+## 3. Advanced Scalability and Performance Tactics
+
+### 3.1. Designing Truly Modular and Reusable Components
+
+-   **Props API Design:** Design component props to be flexible and composable. Use `children` prop effectively. Avoid overly specific props that limit reusability.
+-   **Separation of Concerns:** Keep components focused. If a component does too much (fetches data, handles complex logic, renders UI), break it down.
+
+### 3.2. Strategic Code Splitting and Lazy Loading
+
+-   **`next/dynamic` for Heavy UI:** Use for components that are large, not immediately visible (e.g., modals, below-the-fold content), or rely on heavy client-side libraries.
+    ```typescript
+    // app/article/page.tsx
+    import dynamic from 'next/dynamic';
+
+    const RichTextEditor = dynamic(() => import('@/components/RichTextEditor'), {
+      ssr: false, // Often, editors are client-side only
+      loading: () => <p>Initializing editor...</p>,
+    });
+
+    export default function ArticlePage() {
+      // ...
+      return <RichTextEditor />;
+    }
+    ```
+
+### 3.3. Mastering Image Optimization with `next/image`
+
+-   **`priority` Prop:** Add `priority` to images critical for LCP (Largest Contentful Paint), typically above-the-fold hero images.
+-   **`sizes` Prop:** Crucial for responsive images that have different widths at different breakpoints. Helps Next.js serve appropriately sized images.
+    ```typescript
+    import Image from 'next/image';
+    import heroImage from '@/public/images/hero.jpg';
+
+    export default function HeroSection() {
+      return (
+        <Image
+          src={heroImage}
+          alt="Amazing product hero image"
+          fill // Or width/height
+          priority
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover" // Example for `fill`
+        />
+      );
+    }
+    ```
+
+### 3.4. Proactive Bundle Size Management
+
+-   **Regular Audits:** Use `@next/bundle-analyzer` not just once, but regularly, especially after adding new dependencies.
+-   **Dependency Choices:** Critically evaluate if a large library is necessary or if a smaller alternative or custom solution suffices. Check import costs (e.g., using `import-cost` VS Code extension).
+
+## 4. Enterprise-Grade Security Measures
+
+### 4.1. Robust Server-Side Input Validation
+
+-   **Schema-Based Validation:** Use libraries like Zod for defining and enforcing data schemas for API inputs and form submissions. This is more robust than manual checks.
+    ```typescript
+    // app/api/users/route.ts
+    import { z } from 'zod';
+
+    const CreateUserSchema = z.object({
+      username: z.string().min(3).max(20),
+      email: z.string().email(),
+      password: z.string().min(8),
+    });
+
+    export async function POST(request: Request) {
+      const result = CreateUserSchema.safeParse(await request.json());
+      if (!result.success) {
+        return Response.json({ errors: result.error.flatten() }, { status: 400 });
+      }
+      // Proceed with validated result.data
+    }
+    ```
+
+### 4.2. Comprehensive API Route Security
+
+-   **Rate Limiting:** Implement rate limiting on API routes to prevent abuse (e.g., using `express-rate-limit` if using a custom server, or Vercel's built-in features).
+-   **Security Headers in `next.config.js` or Middleware:** Configure Content Security Policy (CSP), HTTP Strict Transport Security (HSTS), X-Frame-Options, etc., to mitigate common web vulnerabilities.
+    ```javascript
+    // next.config.js
+    const ContentSecurityPolicy = `
+      default-src 'self';
+      script-src 'self' 'unsafe-eval' 'unsafe-inline' *.youtube.com *.twitter.com;
+      child-src *.youtube.com *.google.com *.twitter.com;
+      style-src 'self' 'unsafe-inline' *.googleapis.com;
+      img-src * blob: data:;
+      media-src 'none';
+      connect-src *;
+      font-src 'self' *.gstatic.com;
+    `; // Example, tailor to your needs
+
+    const securityHeaders = [
+      { key: 'Content-Security-Policy', value: ContentSecurityPolicy.replace(/\s{2,}/g, ' ').trim() },
+      { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+      // ... other headers
+    ];
+    module.exports = { async headers() { return [{ source: '/(.*)', headers: securityHeaders }]; } };
+    ```
+
+### 4.3. Diligent Management of Sensitive Data & Secrets
+
+-   **Secrets Rotation Policy:** Establish and follow a policy for regularly rotating API keys, database credentials, and other secrets, especially when using a secrets manager.
+-   **Least Privilege for API Keys:** Ensure API keys used by your Next.js application have the minimum necessary permissions for their intended tasks.
+
+## 5. Streamlined Deployment and Operations
+
+### 5.1. Advanced CI/CD Pipeline Strategies
+
+-   **Automated Testing Stages:** Include comprehensive unit, integration, and end-to-end tests in your CI pipeline before any deployment.
+-   **Environment Promotion:** Implement a clear strategy for promoting builds through different environments (dev -> staging -> production).
+-   **Rollback Plans:** Ensure your CI/CD process includes a reliable and quick rollback mechanism.
+
+### 5.2. Actionable Monitoring and Structured Logging
+
+-   **Custom Tags/Context in Error Tracking:** When using Sentry or similar, add custom tags (e.g., `userId`, `transactionId`, `featureFlag`) to error reports for easier debugging and filtering.
+-   **Structured Logging:** For server-side logs (API Routes, Server Components), use a structured JSON format. This makes logs easily searchable and parsable by log management systems.
+    ```typescript
+    // lib/logger.ts
+    export function logInfo(message: string, context: Record<string, any> = {}) {
+      console.log(JSON.stringify({
+        level: 'INFO',
+        timestamp: new Date().toISOString(),
+        message,
+        ...context,
+      }));
+    }
+    // Usage in an API route:
+    // import { logInfo } from '@/lib/logger';
+    // logInfo('User login attempt', { userId: '123', ipAddress: request.ip });
+    ```
+
+---
+
+
+
+This guide provides a focused set of best practices. Continuous learning and adaptation to the evolving Next.js ecosystem are key. Always consult the official Next.js documentation.
