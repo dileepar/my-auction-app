@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
+import Navigation from '@/components/Navigation';
 
 interface Bid {
   id: string;
@@ -108,9 +109,10 @@ function AuctionDetailPage() {
   const currentBid = Number(auction.current_highest_bid || auction.starting_price);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50">
+      <Navigation />
       <div className="container mx-auto px-4">
-        <nav className="mb-8">
+        <nav className="py-8">
           <ol className="flex items-center space-x-2 text-sm text-gray-500">
             <li>
               <Link href="/auctions" className="hover:text-blue-600">
@@ -121,7 +123,7 @@ function AuctionDetailPage() {
               <span className="mx-2">›</span>
             </li>
             <li className="text-gray-900 font-medium truncate">
-              {auction.title}
+              {auction?.title || 'Loading...'}
             </li>
           </ol>
         </nav>
