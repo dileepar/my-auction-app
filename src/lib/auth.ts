@@ -15,12 +15,6 @@ interface Session extends NextAuthSession {
   user: SessionUser;
 }
 
-// Get the URL from environment variables
-const getBaseUrl = () => {
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return process.env.NEXTAUTH_URL || 'http://localhost:3000';
-};
-
 export const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
