@@ -3,14 +3,22 @@ import { JWT } from 'next-auth/jwt';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { sql } from '@/lib/db';
+import { Session as NextAuthSession } from 'next-auth';
 
 interface User {
   id: string;
   email: string;
 }
 
-interface Session {
-  user: User;
+interface SessionUser {
+  id: string;
+  email: string;
+  name?: string | null;
+  image?: string | null;
+}
+
+interface Session extends NextAuthSession {
+  user: SessionUser;
 }
 
 export const authOptions: AuthOptions = {
@@ -58,17 +66,22 @@ export const authOptions: AuthOptions = {
     signIn: '/login',
   },
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user: User | null }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.email = user.email;
       }
       return token;
     },
-    async session({ session, token }: { session: Session; token: JWT }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-      }
-      return session;
+    async session({ session, token }): Promise<Session> {
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id as string,
+          email: token.email as string,
+        }
+      };
     },
   },
 }; 
