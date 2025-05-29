@@ -27,7 +27,7 @@ interface AuctionDetail {
 function AuctionDetailPage() {
   const params = useParams();
   const [auction, setAuction] = useState<AuctionDetail | null>(null);
-  const [bids] = useState<Bid[]>([]);
+  const bids = useState<Bid[]>([])[0];
   const [bidAmount, setBidAmount] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
