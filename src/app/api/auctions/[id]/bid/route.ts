@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { sql } from '@/lib/db';
 import { authOptions } from '@/lib/auth';
-import { PlaceBidRequest } from '@/types';
+import { PlaceBidRequest, SessionUser } from '@/types';
 
 // POST /api/auctions/[id]/bid - Place a bid
 export async function POST(
@@ -20,7 +20,7 @@ export async function POST(
       );
     }
 
-    const bidder_id = (session.user as any).id;
+    const bidder_id = (session.user as SessionUser).id;
 
     if (!bidder_id) {
       return NextResponse.json(

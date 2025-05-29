@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { sql } from '@/lib/db';
 import { authOptions } from '@/lib/auth';
+import { SessionUser } from '@/types';
 
 // GET /api/users/me/auctions - Get current user's auction listings
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Get user session
     const session = await getServerSession(authOptions);
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const user_id = (session.user as any).id;
+    const user_id = (session.user as SessionUser).id;
 
     if (!user_id) {
       return NextResponse.json(

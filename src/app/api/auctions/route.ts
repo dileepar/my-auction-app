@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { sql } from '@/lib/db';
 import { authOptions } from '@/lib/auth';
-import { CreateAuctionRequest } from '@/types';
+import { CreateAuctionRequest, SessionUser } from '@/types';
 
 // GET /api/auctions - List all active auctions
 export async function GET() {
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const seller_id = (session.user as any).id;
+    const seller_id = (session.user as SessionUser).id;
 
     if (!seller_id) {
       return NextResponse.json(

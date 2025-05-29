@@ -60,4 +60,11 @@ export interface RegisterRequest {
 export interface ApiResponse<T> {
   data?: T;
   error?: string;
+}
+
+export interface SessionUser {
+  id: string;
+  email?: string | null;
+  name?: string | null;
+  image?: string | null;
 } 
