@@ -18,7 +18,7 @@ This document serves as the development contract and action plan for building an
 
 ### 1.1 Project Initialization
 - [x] Create new Next.js project with TypeScript
-- [ ] Set up Vercel project and connect to GitHub repository
+- [x] Set up Vercel project and connect to GitHub repository
 - [x] Configure Tailwind CSS
 - [x] Set up ESLint and Prettier configurations
 - [x] Create basic project structure and folders
@@ -70,34 +70,34 @@ This document serves as the development contract and action plan for building an
 ## Phase 2: Authentication & Seller Interface
 
 ### 2.1 User Registration & Login System
-- [ ] Set up NextAuth.js configuration
-- [ ] Implement credentials provider for email/password authentication
-- [ ] Create registration API route: `POST /api/auth/register`
-- [ ] Implement password hashing with bcrypt
-- [ ] Create login page UI (`/login`)
-- [ ] Create registration page UI (`/register`)
-- [ ] Add session management and protected route middleware
-- [ ] Implement logout functionality
+- [x] Set up NextAuth.js configuration
+- [x] Implement credentials provider for email/password authentication
+- [x] Create registration API route: `POST /api/auth/register`
+- [x] Implement password hashing with bcrypt
+- [x] Create login page UI (`/login`)
+- [x] Create registration page UI (`/register`)
+- [x] Add session management and protected route middleware
+- [x] Implement logout functionality
 
 ### 2.2 Item Listing Creation Interface
-- [ ] Create "Create Auction" page UI (`/auctions/create`)
-- [ ] Implement form with fields:
+- [x] Create "Create Auction" page UI (`/auctions/create`)
+- [x] Implement form with fields:
   - Title
   - Description (textarea)
   - Starting price (number input)
   - Auction end date/time (datetime-local input)
   - Image URL (text input for MVP)
-- [ ] Add form validation (client-side and server-side)
-- [ ] Connect form submission to `POST /api/auctions` endpoint
-- [ ] Add success/error feedback messages
-- [ ] Implement redirect to auction detail page after successful creation
+- [x] Add form validation (client-side and server-side)
+- [x] Connect form submission to `POST /api/auctions` endpoint
+- [x] Add success/error feedback messages
+- [x] Implement redirect to auction detail page after successful creation
 
 ### 2.3 Seller Dashboard - View Own Listings
-- [ ] Create seller dashboard page (`/dashboard/auctions`)
-- [ ] Display list of user's auction listings
-- [ ] Show auction status, current highest bid, and time remaining
-- [ ] Add "Create New Auction" button linking to creation form
-- [ ] Implement responsive design for mobile devices
+- [x] Create seller dashboard page (`/dashboard/auctions`)
+- [x] Display list of user's auction listings
+- [x] Show auction status, current highest bid, and time remaining
+- [x] Add "Create New Auction" button linking to creation form
+- [x] Implement responsive design for mobile devices
 
 ---
 

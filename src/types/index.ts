@@ -1,24 +1,23 @@
 export interface User {
   id: string;
   email: string;
-  password_hash: string;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Auction {
   id: string;
   seller_id: string;
   title: string;
-  description: string | null;
+  description: string;
   starting_price: number;
   current_highest_bid: number | null;
   current_highest_bidder_id: string | null;
-  end_time: Date;
+  end_time: string;
   status: 'active' | 'closed' | 'cancelled';
   image_url: string | null;
-  created_at: Date;
-  updated_at: Date;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Bid {
@@ -26,7 +25,7 @@ export interface Bid {
   auction_id: string;
   bidder_id: string;
   bid_amount: number;
-  created_at: Date;
+  created_at: string;
 }
 
 // API Request/Response types
@@ -56,4 +55,9 @@ export interface LoginRequest {
 export interface RegisterRequest {
   email: string;
   password: string;
+}
+
+export interface ApiResponse<T> {
+  data?: T;
+  error?: string;
 } 
