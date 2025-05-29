@@ -32,7 +32,8 @@ export default function LoginPage() {
         router.refresh();
       }
     } catch (err) {
-      setError('An unexpected error occurred');
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
